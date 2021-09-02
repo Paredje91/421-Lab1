@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Lab1
@@ -14,19 +8,26 @@ namespace Lab1
     {
         public Form1()
         {
-            InitializeComponent();
-            
+            InitializeComponent();            
         }
-        
-        Bitmap bm;
-        Graphics g;
-        Color color = new Color();
 
-        int oldX, oldY, newX, newY, calcX, calcY, x, y;
-        bool paint = false;
+// -- VARIABLES --
+        
+        // background and foreground for double buffering
+        Bitmap bg, fg; 
+        Graphics g, bgg, fgg;
+
+        Color color = new Color();
         Pen pen = new Pen(Color.Black);
-        int buttonNum = 1;
+        Point pt1, pt2; 
+
+        int buttonNum = 1;  //default to line drawing
+        bool toPaint = false;    
         int blueVal, greenVal, redVal;
+        int calcX, calcY;
+
+//-- SHAPES --
+// create shapes based on button clicked by user
 
         private void btn_rec_Click(object sender, EventArgs e)
         {
@@ -43,6 +44,9 @@ namespace Lab1
             buttonNum = 1;
         }
 
+//-- COLORS --
+// color values for pen based tracker info by user
+
         private void greenTrackBar_Scroll(object sender, EventArgs e)
         {
             greenVal = greenTrackBar.Value;
@@ -58,66 +62,69 @@ namespace Lab1
             redVal = redTrackBar.Value;
         }
 
-        
-
+// -- MOUSE --
+// mouse events click (down), release (up), and move 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
+            toPaint = true;
 
-            
-            paint = true;
-            oldX = e.X;
-            oldY = e.Y;
+            // -- DOUBLE BUFFERING -- 
+            if (bg == null)
+            {
+                bg = fg = new Bitmap(this.Width, this.Height); 
+                bgg = Graphics.FromImage(bg); 
+                bgg.FillRectangle(Brushes.White, 0, 0, this.Width, this.Height); // fills with White to prevent many shapes from being drawn
+                fgg = Graphics.FromImage(fg); 
+            }
 
+            pt1 = e.Location; //starting point
         }
 
         private void panel1_MouseUp(object sender, MouseEventArgs e)
-        { 
-            
-            paint = false;
-
-
-            
-
+        {
+            toPaint = false;
+            //current shape should be saved to background image from foreground
+            //2 lines, including controlling the bool. so only 1 more... 
+            bgg = Graphics.FromImage(fg);
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
-            g = panel1.CreateGraphics();
-            newX = e.X;
-            newY = e.Y;
+            calcX = Math.Abs(pt2.X - pt1.X);
+            calcY = Math.Abs(pt1.Y - pt2.Y);
 
-            calcX = Math.Abs(newX - oldX);
-            calcY = Math.Abs(oldY - newY);
-
-            pen.Color = Color.FromArgb(redVal, greenVal, blueVal);
-
-            if (paint)
+            // -- CREATE SHAPES --
+            if (toPaint == true)
             {
+                //-- DOUBLE BUFFERING --
+                fgg.DrawImage(bg, 0, 0);
+
+                pen.Color = Color.FromArgb(redVal, greenVal, blueVal);
+                pt2 = e.Location; //current point
+
+                //-- SHAPE PER BUTTON -- 
                 if (buttonNum == 1)
                 {
-                    g.DrawLine(pen, oldX, oldY, newX, newY);
-
+                    fgg.DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
                 }
 
                 if (buttonNum == 2)
                 {
-                    g.DrawRectangle(pen, oldX, oldY, calcX, calcY);
+                    fgg.DrawRectangle(pen, pt1.X, pt1.Y, calcX, calcY);
                 }
 
                 if (buttonNum == 3)
                 {
-                    g.DrawEllipse(pen, oldX, oldY, calcX, calcY);
+                    fgg.DrawEllipse(pen, pt1.X, pt1.Y, calcX, calcY);
                 }
 
+                g = this.CreateGraphics();
+                g.DrawImage(fg, 0, 0);
             }
-            
-           
-
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-
             
 
 
