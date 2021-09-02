@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing.Text;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Lab1
@@ -15,19 +11,24 @@ namespace Lab1
         public Form1()
         {
             InitializeComponent();
-            
+
         }
+
+// -- VARIABLES --
         
-        Bitmap bm;
-        Graphics g;
-        Color color = new Color();
+        //background and foreground for double buffering
+        Bitmap bg, fg;
+        Graphics g, bgg, fgg;
 
-        int oldX, oldY, newX, newY, calcX, calcY, x, y;
-        bool paint = false;
+        Point pt1, pt2;
+        bool toPaint = false;
         Pen pen = new Pen(Color.Black);
-        int buttonNum = 1;
-        int blueVal, greenVal, redVal;
+        int buttonNum = 1; //default to line drawing
+        int blueVal, greenVal, redVal; 
+        int calcX, calcY;
 
+// -- SHAPES --
+//   create shapes based on button clicked by user
         private void btn_rec_Click(object sender, EventArgs e)
         {
             buttonNum = 2;
@@ -43,6 +44,8 @@ namespace Lab1
             buttonNum = 1;
         }
 
+//-- COLORS --
+//  color values for pen based tracker info by user
         private void greenTrackBar_Scroll(object sender, EventArgs e)
         {
             greenVal = greenTrackBar.Value;
@@ -58,68 +61,78 @@ namespace Lab1
             redVal = redTrackBar.Value;
         }
 
-        
 
+//-- MOUSE --
+//  mouse events click (down), release (up), and move
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
 
-            
-            paint = true;
-            oldX = e.X;
-            oldY = e.Y;
+            toPaint = true;
+            pt1 = e.Location;
+
+            //-- DOUBLE BUFFERING --
+            if (bg == null)
+            {
+                bg = new Bitmap(this.Width, this.Height);
+                fg = new Bitmap(this.Width, this.Height);
+                bgg = Graphics.FromImage(bg);
+                bgg.FillRectangle(Brushes.White, 0 ,0, this.Width, this.Height);
+                fgg = Graphics.FromImage(fg);
+            }
 
         }
 
         private void panel1_MouseUp(object sender, MouseEventArgs e)
-        { 
+        {
+
+            toPaint = false;
+            bgg.DrawImage(fg, 0, 0);
             
-            paint = false;
-
-
-            
-
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
-            g = panel1.CreateGraphics();
-            newX = e.X;
-            newY = e.Y;
 
-            calcX = Math.Abs(newX - oldX);
-            calcY = Math.Abs(oldY - newY);
+            calcX = Math.Abs(pt2.X - pt1.X);
+            calcY = Math.Abs(pt1.Y - pt2.Y);
 
             pen.Color = Color.FromArgb(redVal, greenVal, blueVal);
+            pt2 = e.Location; //current point
 
-            if (paint)
+            //-- CREATE SHAPES --
+            if (toPaint)
             {
+                //-- DOUBLE BUFFERING --
+                fgg.DrawImage(bg, 0, 0);
+                
+                //-- SHAPE PER BUTTON --
                 if (buttonNum == 1)
                 {
-                    g.DrawLine(pen, oldX, oldY, newX, newY);
+                    fgg.DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
 
                 }
 
                 if (buttonNum == 2)
                 {
-                    g.DrawRectangle(pen, oldX, oldY, calcX, calcY);
+                    fgg.DrawRectangle(pen, pt1.X, pt1.Y, calcX, calcY);
                 }
 
                 if (buttonNum == 3)
                 {
-                    g.DrawEllipse(pen, oldX, oldY, calcX, calcY);
+                    fgg.DrawEllipse(pen, pt1.X, pt1.Y, calcX, calcY);
                 }
+
+                g = panel1.CreateGraphics();
+                g.DrawImage(fg, 0, 0);
 
             }
             
-           
+
 
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-
-            
-
 
         }
 
