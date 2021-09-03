@@ -11,6 +11,7 @@ namespace Lab1
         public Form1()
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
 
         }
 
@@ -23,7 +24,7 @@ namespace Lab1
         Point pt1, pt2;
         bool toPaint = false;
         Pen pen = new Pen(Color.Black);
-        int buttonNum = 1; //default to line drawing
+        int buttonNum = 0; //default to line drawing
         int blueVal, greenVal, redVal; 
         int calcX, calcY;
 
@@ -133,6 +134,25 @@ namespace Lab1
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
+            Graphics g = e.Graphics;
+
+
+            if (buttonNum == 1)
+            {
+                g.DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
+
+            }
+
+            if (buttonNum == 2)
+            {
+                g.DrawRectangle(pen, pt1.X, pt1.Y, calcX, calcY);
+            }
+
+            if (buttonNum == 3)
+            {
+                g.DrawEllipse(pen, pt1.X, pt1.Y, calcX, calcY);
+            }
+           
 
         }
 
