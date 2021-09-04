@@ -27,6 +27,7 @@ namespace Lab1
         int buttonNum;
         int blueVal, greenVal, redVal; 
         int calcX, calcY;
+        int minX, minY, maxX, maxY; 
 
 // -- SHAPES --
 //   create shapes based on button clicked by user
@@ -91,11 +92,19 @@ namespace Lab1
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
-            calcX = (pt2.X - pt1.X); //width
-            calcY = (pt2.Y - pt1.Y); //height
-
             pen.Color = Color.FromArgb(redVal, greenVal, blueVal);
             pt2 = e.Location; //current point
+            
+            calcX = (pt2.X - pt1.X); // ellipse width
+            calcY = (pt2.Y - pt1.Y); // ellipse height
+
+            minX = Math.Min(pt1.X, e.X); 
+            minY = Math.Min(pt1.Y, e.Y); 
+            maxX = Math.Max(pt1.X, e.X); 
+            maxY = Math.Max(pt1.Y, e.Y);
+            
+            var startpt= new Point(Math.Max(0, Math.Min(pt1.X, e.X)), Math.Max(0, Math.Min(pt1.Y, e.Y)));
+            var endpt = new Point(Math.Min(this.Width, Math.Max(pt1.X, e.X)), Math.Min(this.Height, Math.Max(pt1.Y, e.Y)));
 
             //-- CREATE SHAPES --
             if (toPaint)
@@ -111,7 +120,7 @@ namespace Lab1
 
                 if (buttonNum == 2)
                 {
-                    fgg.DrawRectangle(pen, pt1.X, pt1.Y, calcX, calcY);
+                    fgg.DrawRectangle(pen, startpt.X, startpt.Y, endpt.X-startpt.X, endpt.Y-startpt.Y);
                 }
 
                 if (buttonNum == 3)
