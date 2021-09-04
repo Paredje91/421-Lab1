@@ -24,7 +24,7 @@ namespace Lab1
         Point pt1, pt2;
         bool toPaint = false;
         Pen pen = new Pen(Color.Black);
-        int buttonNum = 0; //default to line drawing
+        int buttonNum;
         int blueVal, greenVal, redVal; 
         int calcX, calcY;
 
@@ -77,25 +77,22 @@ namespace Lab1
                 bg = new Bitmap(this.Width, this.Height);
                 fg = new Bitmap(this.Width, this.Height);
                 bgg = Graphics.FromImage(bg);
-                bgg.FillRectangle(Brushes.White, 0 ,0, this.Width, this.Height);
+                bgg.FillRectangle(Brushes.White, 0 ,0, this.Width, this.Height); //prevents interim shapes from staying on panel
                 fgg = Graphics.FromImage(fg);
             }
-
         }
 
         private void panel1_MouseUp(object sender, MouseEventArgs e)
         {
-
             toPaint = false;
-            bgg.DrawImage(fg, 0, 0);
-            
+            bgg.DrawImage(fg, 0, 0);  
+            //fgg.DrawImage(fg, 0, 0);
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
-
-            calcX = Math.Abs(pt2.X - pt1.X);
-            calcY = Math.Abs(pt1.Y - pt2.Y);
+            calcX = (pt2.X - pt1.X); //width
+            calcY = (pt2.Y - pt1.Y); //height
 
             pen.Color = Color.FromArgb(redVal, greenVal, blueVal);
             pt2 = e.Location; //current point
@@ -105,12 +102,11 @@ namespace Lab1
             {
                 //-- DOUBLE BUFFERING --
                 fgg.DrawImage(bg, 0, 0);
-                
-                //-- SHAPE PER BUTTON --
+
+                //-- SHAPE BY BUTTON --
                 if (buttonNum == 1)
                 {
                     fgg.DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
-
                 }
 
                 if (buttonNum == 2)
@@ -125,22 +121,16 @@ namespace Lab1
 
                 g = panel1.CreateGraphics();
                 g.DrawImage(fg, 0, 0);
-
             }
-            
-
-
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
-
+            g = e.Graphics;
 
             if (buttonNum == 1)
             {
                 g.DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
-
             }
 
             if (buttonNum == 2)
@@ -152,10 +142,6 @@ namespace Lab1
             {
                 g.DrawEllipse(pen, pt1.X, pt1.Y, calcX, calcY);
             }
-           
-
         }
-
-
     }
 }
