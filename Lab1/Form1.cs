@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*  SWENG 421 - FA 21
+ *  Jess Marques & Hope Fisher
+ *  Lab 1: paint program in C#, to include
+ *      - 3 shapes: line, rectangle, and ellipse
+ *      - rgb color options
+ *      - arbitrary directionality
+ *      - resizable window without losing drawings
+ *      - real time shape sizing with mouse movement
+ *      
+ *  NOTES: double buffering included. Some extreme window size changes causes glitch, 
+ *          where some drawings are cropped. Next mouse click will restore view.  
+ * */
+using System;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Globalization;
@@ -11,8 +23,7 @@ namespace Lab1
         public Form1()
         {
             InitializeComponent();
-            this.DoubleBuffered = true;
-
+            this.DoubleBuffered = true;  
         }
 
 // -- VARIABLES --
@@ -22,12 +33,14 @@ namespace Lab1
         Graphics g, bgg, fgg;
 
         Point pt1, pt2;
-        bool toPaint = false;
         Pen pen = new Pen(Color.Black);
+        
+        bool toPaint = false;
+
         int buttonNum;
         int blueVal, greenVal, redVal; 
         int calcX, calcY;
-        int minX, minY, maxX, maxY; 
+        int minX, minY; 
 
 // -- SHAPES --
 //   create shapes based on button clicked by user
@@ -68,7 +81,6 @@ namespace Lab1
 //  mouse events click (down), release (up), and move
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
-
             toPaint = true;
             pt1 = e.Location;
 
@@ -87,22 +99,18 @@ namespace Lab1
         {
             toPaint = false;
             bgg.DrawImage(fg, 0, 0);  
-            //fgg.DrawImage(fg, 0, 0);
         }
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
             pen.Color = Color.FromArgb(redVal, greenVal, blueVal);
-            pt2 = e.Location; //current point
+            pt2 = e.Location; 
             
-            calcX = (pt2.X - pt1.X); // ellipse width
-            calcY = (pt2.Y - pt1.Y); // ellipse height
-
-            minX = Math.Min(pt1.X, e.X); 
-            minY = Math.Min(pt1.Y, e.Y); 
-            maxX = Math.Max(pt1.X, e.X); 
-            maxY = Math.Max(pt1.Y, e.Y);
+            //ellipse width & height 
+            calcX = (pt2.X - pt1.X); 
+            calcY = (pt2.Y - pt1.Y); 
             
+            //rectangle start and end points for arbitrary direction
             var startpt= new Point(Math.Max(0, Math.Min(pt1.X, e.X)), Math.Max(0, Math.Min(pt1.Y, e.Y)));
             var endpt = new Point(Math.Min(this.Width, Math.Max(pt1.X, e.X)), Math.Min(this.Height, Math.Max(pt1.Y, e.Y)));
 
