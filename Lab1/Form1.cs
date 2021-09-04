@@ -1,5 +1,5 @@
 ﻿/*  SWENG 421 - FA 21
- *  Jess Marques & Hope Fisher
+ *  Jess Marquez & Hope Fisher
  *  Lab 1: paint program in C#, to include
  *      - 3 shapes: line, rectangle, and ellipse
  *      - rgb color options
@@ -75,7 +75,6 @@ namespace Lab1
         {
             redVal = redTrackBar.Value;
         }
-
 
 //-- MOUSE --
 //  mouse events click (down), release (up), and move
